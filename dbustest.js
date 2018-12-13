@@ -22,15 +22,16 @@ const ScreenSaverInterface =
 
 const ScreenSaverProxy = Gio.DBusProxy.makeProxyWrapper(ScreenSaverInterface);
 
-let screenSaverProxy = new ScreenSaverProxy(
+new ScreenSaverProxy(
     Gio.DBus.session,
     "org.gnome.ScreenSaver",
-    "/org/gnome/ScreenSaver"
+    "/org/gnome/ScreenSaver",
+    function callback(proxy, error) {
+        proxy.connectSignal("ActiveChanged", function (proxy, sender, new_value) {
+            print("Locked status: " + new_value);
+        })
+    }
 );
-
-screenSaverProxy.connectSignal("ActiveChanged", function (proxy, sender, new_value) {
-    print("Locked status: " + new_value);
-});
 
 let loop = new GLib.MainLoop(null, false);
 loop.run();

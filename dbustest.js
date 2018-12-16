@@ -1,37 +1,33 @@
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 
-const ScreenSaverInterface =
-    '<node> \
-            <interface name="org.gnome.ScreenSaver"> \
-                    <method name="Lock" /> \
-                    <method name="GetActive"> \
-                            <arg name="active" direction="out" type="b" /> \
-                    </method> \
-                    <method name="SetActive"> \
-                            <arg name="value" direction="in" type="b" /> \
-                    </method> \
-                    <method name="GetActiveTime"> \
-                            <arg name="value" direction="out" type="u" /> \
-                    </method> \
-                    <signal name="ActiveChanged"> \
-                            <arg name="new_value" type="b" /> \
-                    </signal> \
-            </interface> \
-    </node>';
 
-const ScreenSaverProxy = Gio.DBusProxy.makeProxyWrapper(ScreenSaverInterface);
-
-new ScreenSaverProxy(
-    Gio.DBus.session,
-    "org.gnome.ScreenSaver",
-    "/org/gnome/ScreenSaver",
-    function callback(proxy, error) {
-        proxy.connectSignal("ActiveChanged", function (proxy, sender, new_value) {
-            print("Locked status: " + new_value);
-        })
+function callback(connection, senderName, objectPath, interfaceName, signalName, parameters, userData) {
+    // log("connection: " + connection);
+    // log("senderName: " + senderName);
+    // log("objectPath: " + objectPath);
+    // log("interfaceName: " + interfaceName);
+    // log("signalName: " + signalName);
+    // log("parameters: " + parameters);
+    // log("userData: " + userData);
+    let unpacked = parameters.get_child_value(0).get_boolean();
+    if (unpacked) {
+        log("unpacked value: " + unpacked);
+        log("unpacked type: " + typeof unpacked);
     }
+}
+
+let id = Gio.DBus.session.signal_subscribe(
+    null,
+    "org.gnome.ScreenSaver",
+    "ActiveChanged",
+    "/org/gnome/ScreenSaver",
+    null,
+    0,
+    callback
 );
+
+// Gio.DBus.session.signal_unsubscribe(id);
 
 let loop = new GLib.MainLoop(null, false);
 loop.run();

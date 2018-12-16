@@ -3,11 +3,6 @@ const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 
 function callback(connection, senderName, objectPath, interfaceName, signalName, parameters, userData) {
-    let unpacked = parameters.get_child_value(0).get_boolean();
-    if (unpacked) {
-        log("[lockautolayout] unpacked value: " + unpacked);
-        log("[lockautolayout] unpacked type: " + typeof unpacked);
-    }
     let new_value = parameters.get_child_value(0).get_boolean();
     if (new_value) {
         Keyboard.getInputSourceManager().inputSources[0].activate();
